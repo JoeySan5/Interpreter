@@ -2,7 +2,7 @@
 
 # Final Exam
 
-⏰ **Due by: 5/15/2023 EOD**
+⏰ **Due by: 5/17/2023 EOD**
 
 ## Ethics Contract
 
