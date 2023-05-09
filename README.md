@@ -143,10 +143,8 @@ In this part, you must:
 
 In this part, you must:
 
-1. Modify the existing parser to support the new grammar rules you defined in Part 1. 
+1. Modify the existing parser to support the new grammar rules you defined in Part 1. This will involve adding new parser node variants.
 2. Implement the necessary parser combinators for your chosen feature (conditional operators or if-expressions). 
-3. Provide example code that demonstrates how your parser correctly recognizes and parses your chosen feature. 
-4. Ensure your parser returns informative error messages for invalid expressions.
 
 ## Part 3 - Interpreter
 
