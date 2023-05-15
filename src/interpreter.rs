@@ -97,10 +97,45 @@ impl Runtime {
             "-" => Ok(Value::Number(value1 - value2)),
             "*" => Ok(Value::Number(value1 * value2)),
             "/" => Ok(Value::Number(value1 / value2)),
-            "^" => Ok(Value::Number(value1.pow(value2.try_into().unwrap()))),
+            "^" => {
+                    let mut exp_result = 1;
+                        for i in 0..value2 {
+                            exp_result = exp_result * value1;
+                        }
+                        Ok(Value::Number(exp_result))
+            },
             _ => Err("Unimplemented math exp")
         },
           _=> {Err("Unimplemeneted math exp")}
+        };
+
+        result
+        
+      },
+      Node::ConditionalExpression{name, children} => {
+        
+        let lhs = self.run(&children[0]);
+        let rhs = self.run(&children[1]);
+        // two possibilites of lhs and rhs
+        // lhs: bool & rhs: bool
+        // lhs: number(also id) & rhs: number(also id)
+        // the rest of the possibilites should result in an error
+
+
+        let result = match (lhs,rhs) {
+          (Ok(Value::Number(value1)), Ok(Value::Number(value2))) => match name.as_str() {
+            ">" => Ok(Value::Bool(value1 > value2)),
+            "<" => Ok(Value::Bool(value1 < value2)),
+            "<=" => Ok(Value::Bool(value1 <= value2)),
+            ">=" => Ok(Value::Bool(value1 >= value2)),
+            "==" => Ok(Value::Bool(value1 == value2)),
+            _ => Err("Undefined Operator for numbers")
+        },
+        (Ok(Value::Bool(value1)), Ok(Value::Bool(value2))) => match name.as_str(){
+          "==" => Ok(Value::Bool(value1 == value2)),
+            _ => Err("Undefined Operator for boolean")
+        },
+          _=> {Err("This math expression is not possible")}
         };
 
         result

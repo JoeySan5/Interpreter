@@ -79,7 +79,7 @@ use nom::{
     Ok((input, args))
   }
   pub fn l4(input: &str) -> IResult<&str, Node> {
-    alt((function_call, number, identifier, parenthetical_expression))(input)
+    alt((function_call, boolean, number, identifier, parenthetical_expression))(input)
   }
   pub fn l3_infix(input: &str) -> IResult<&str, Node> {
     let (input, _) = many0(tag(" "))(input)?;

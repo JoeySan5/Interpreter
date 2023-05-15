@@ -5,7 +5,7 @@ use asalang::{program, Value, start_interpreter, Node};
 
 fn main() -> Result<(), nom::Err<(&'static str, nom::error::ErrorKind)>> {
   
-  let result = program(r#"3 +5 > 3 == 4"#);
+  let result = program(r#"2 > 4"#);
   match result {
     Ok((unparsed,tree)) => {
       println!("Unparsed Text: {:?}", unparsed);
