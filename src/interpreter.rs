@@ -129,10 +129,12 @@ impl Runtime {
             "<=" => Ok(Value::Bool(value1 <= value2)),
             ">=" => Ok(Value::Bool(value1 >= value2)),
             "==" => Ok(Value::Bool(value1 == value2)),
+            "!=" => Ok(Value::Bool(value1 != value2)),
             _ => Err("Undefined Operator for numbers")
         },
         (Ok(Value::Bool(value1)), Ok(Value::Bool(value2))) => match name.as_str(){
           "==" => Ok(Value::Bool(value1 == value2)),
+          "!=" => Ok(Value::Bool(value1 != value2)),
             _ => Err("Undefined Operator for boolean")
         },
           _=> {Err("This math expression is not possible")}
