@@ -5,10 +5,10 @@ use asalang::{program, Value, start_interpreter, Node};
 
 fn main() -> Result<(), nom::Err<(&'static str, nom::error::ErrorKind)>> {
   
-  let result = program(r#"fn main(){let x = 10;
-  let y = 5;
-  let z = 3;
-  let result = x + y * z > x * y - z != true;}
+  let result = program(r#"fn main(){let x = 5;
+  let y = 4;
+  let z = 2;
+  let result = x - y * z > y / z + x != true;}
   "#);
   match result {
     Ok((unparsed,tree)) => {

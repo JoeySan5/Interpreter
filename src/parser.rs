@@ -24,6 +24,8 @@ use nom::{
     Expression { children: Vec<Node> },
     MathExpression {name: String, children: Vec<Node> },
     ConditionalExpression {name: String, children: Vec<Node>},
+    IfExpression {children: Vec<Node>},
+    ElseIfExpression{children: Vec<Node>},
     MathAdd {children: Vec<Node> },
     FunctionCall { name: String, children: Vec<Node> },
     VariableDefine { children: Vec<Node> },
@@ -72,7 +74,7 @@ use nom::{
     let (input, _) = many0(tag(" "))(input)?;
     let (input, _) = tag("(")(input)?;
     let (input, _) = many0(tag(" "))(input)?;
-    let (input, args) = l1(input)?;
+    let (input, args) = alt((conditional_expression,l1))(input)?;
     let (input, _) = many0(tag(" "))(input)?;
     let (input, _) = tag(")")(input)?;
     let (input, _) = many0(tag(" "))(input)?;
@@ -133,8 +135,11 @@ use nom::{
     Ok((input, Node::MathExpression{name: op.to_string(), children: vec![args]}))
   }
   pub fn l1(input: &str) -> IResult<&str, Node> {
+    let (input, _) = many0(tag(" "))(input)?;
     let (input, mut head) = l2(input)?;
+    let (input, _) = many0(tag(" "))(input)?;
     let (input, tail) = many0(l1_infix)(input)?;
+    let (input, _) = many0(tag(" "))(input)?;
     for n in tail {
       match n {
         Node::MathExpression{name, mut children} => {
@@ -149,7 +154,9 @@ use nom::{
   }
   
   pub fn math_expression(input: &str) -> IResult<&str, Node> {
+    let (input, _) = many0(tag(" "))(input)?;
     l1(input)
+    
   }
 
   pub fn conditional_expression(input: &str) -> IResult<&str, Node>{
@@ -171,7 +178,7 @@ use nom::{
   
   pub fn op_infix(input: &str) -> IResult<&str, Node> {
     let (input, _) = many0(tag(" "))(input)?;
-    let (input, op) = alt((tag("<"),tag(">"),tag(">="),tag("<="),tag("=="),tag("!=")))(input)?;
+    let (input, op) = alt((tag(">="),tag("<="),tag("<"),tag(">"),tag("=="),tag("!=")))(input)?;
     let (input, _) = many0(tag(" "))(input)?;
     let (input, args) = math_expression(input)?;
     Ok((input, Node::ConditionalExpression{name: op.to_string(), children: vec![args]}))
@@ -193,6 +200,37 @@ pub fn value(input: &str) -> IResult<&str, Node> {
     let (input, result) = alt((boolean,conditional_expression, math_expression, function_call, number, string, identifier))(input)?;
     Ok((input, Node::Expression{ children: vec![result]}))   
   }
+
+  //if_expression  = "if" , (conditional_expression | boolean) , "{" , {statement} , "}" , [{ else_if_expression}] , "else" , "{" {statement} "}" ;
+  // pub fn if_expression(input: &str) -> IResult<&str, Node> {
+  //   let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
+  //   let (input, _) = tag("if")(input)?;
+  //   let (input, _) = many0(tag(" "))(input)?;
+  //   let (input, exp) = alt((boolean, conditional_expression))(input)?;
+  //   let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
+  //   let (input, _) = tag("{")(input)?;
+  //   let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
+  //   let (input, commands) = many1(statement)(input)?;
+  //   let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
+  //   let (input, _) = tag("}")(input)?;
+
+
+  // }
+
+  // //else_if_expression = "else", "if", (conditional_expression | boolean), "{", {statement}, "}" ;
+  // pub fn else_if_expression(input: &str) -> IResult<&str, Node> {
+  //   let (input, _) = tag("else")(input)?;
+  //   let (input, _) = many0(tag(" "))(input)?;
+  //   let (input, _) = tag("if")(input)?;
+  //   let (input, exp) = alt((boolean, conditional_expression))(input)?;
+  //   let (input, _) = tag("{")(input)?;
+  //   let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
+  //   let (input, commands) = many1(statement)(input)?;
+  //   let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
+  //   let (input, _) = tag("}")(input)?;
+
+
+  // }
   
   pub fn statement(input: &str) -> IResult<&str, Node> {
     let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
@@ -258,7 +296,7 @@ pub fn value(input: &str) -> IResult<&str, Node> {
   
   // program = function_definition+ ;
   pub fn program(input: &str) -> IResult<&str, Node> {
-    let (input, result) = many1(alt((function_definition,statement,expression,statement,number,boolean,string)))(input)?;
+    let (input, result) = many1(alt((function_definition,statement,expression,number,boolean,string)))(input)?;
     Ok((input, Node::Program{ children: result}))
   }
   
