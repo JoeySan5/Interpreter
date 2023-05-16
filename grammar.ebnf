@@ -7,7 +7,7 @@ Notation:
 ??    Special Form
 
 program                 = {function_definition} ;
-function_definition     = "fn" , identifier , "(" , [arguments] , ")" , "{" , [{statement}] , "}" ;
+function_definition     = "fn" , identifier , "(" , [arguments] , ")" , "{" , {statement} , "}" ;
 arguments               = expression , { "," , expression } ;
 statement               = variable_define , ";" | function_return , ";"  ;
 variable_define         = "let" , identifier , "=" , expression ;

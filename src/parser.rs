@@ -195,42 +195,70 @@ pub fn value(input: &str) -> IResult<&str, Node> {
 
 }
 
-  //expression = boolean | math_expression | function_call | number | string | identifier ;
+  //expression = boolean | if_expression | math_expression | function_call | number | string | identifier ;
   pub fn expression(input: &str) -> IResult<&str, Node> {
-    let (input, result) = alt((boolean,conditional_expression, math_expression, function_call, number, string, identifier))(input)?;
+    let (input, result) = alt((boolean, if_expression, conditional_expression, math_expression, function_call, number, string, identifier))(input)?;
     Ok((input, Node::Expression{ children: vec![result]}))   
   }
 
   //if_expression  = "if" , (conditional_expression | boolean) , "{" , {statement} , "}" , [{ else_if_expression}] , "else" , "{" {statement} "}" ;
-  // pub fn if_expression(input: &str) -> IResult<&str, Node> {
-  //   let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
-  //   let (input, _) = tag("if")(input)?;
-  //   let (input, _) = many0(tag(" "))(input)?;
-  //   let (input, exp) = alt((boolean, conditional_expression))(input)?;
-  //   let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
-  //   let (input, _) = tag("{")(input)?;
-  //   let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
-  //   let (input, commands) = many1(statement)(input)?;
-  //   let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
-  //   let (input, _) = tag("}")(input)?;
+  pub fn if_expression(input: &str) -> IResult<&str, Node> {
+    let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
+    let (input, _) = tag("if")(input)?;
+    let (input, _) = many0(tag(" "))(input)?;
+    let (input, if_exp) = alt((boolean, conditional_expression))(input)?;
+    let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
+    let (input, _) = tag("{")(input)?;
+    let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
+    //returns a vec of statements (if block)
+    let (input, mut if_commands) = many1(statement)(input)?;
+    let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
+    let (input, _) = tag("}")(input)?;
+    let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
+    //returns a vec of elseif nodes if any
+    let (input, mut else_exp) = many0(else_if_expression)(input)?;
+    let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
+    let (input, _) = tag("else")(input)?;
+    let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
+    let (input, _) = tag("{")(input)?;
+    let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
+    //returns a vec of statements (else block)
+    let (input, mut else_commands) = many1(statement)(input)?;
+    let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
+    let (input, _) = tag("}")(input)?;
+    let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
+
+    let mut new_vec = vec![if_exp];
+    new_vec.append(&mut if_commands);
+    new_vec.append(&mut else_exp);
+    new_vec.append(&mut else_commands);
+
+    Ok((input, Node::IfExpression{children: new_vec}))
+
+  }
+
+  //else_if_expression = "else", "if", (conditional_expression | boolean), "{", {statement}, "}" ;
+  pub fn else_if_expression(input: &str) -> IResult<&str, Node> {
+    let (input, _) = tag("else")(input)?;
+    let (input, _) = many0(tag(" "))(input)?;
+    let (input, _) = tag("if")(input)?;
+    let (input, _) = many0(tag(" "))(input)?;
+    let (input, exp) = alt((boolean, conditional_expression))(input)?;
+    let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
+    let (input, _) = tag("{")(input)?;
+    let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
+    let (input, mut commands) = many1(statement)(input)?;
+    let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
+    let (input, _) = tag("}")(input)?;
+    let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
+    
+    let mut new_vec = vec![exp];
+    new_vec.append(&mut commands);
+
+    Ok((input, Node::ElseIfExpression{children: new_vec}))
 
 
-  // }
-
-  // //else_if_expression = "else", "if", (conditional_expression | boolean), "{", {statement}, "}" ;
-  // pub fn else_if_expression(input: &str) -> IResult<&str, Node> {
-  //   let (input, _) = tag("else")(input)?;
-  //   let (input, _) = many0(tag(" "))(input)?;
-  //   let (input, _) = tag("if")(input)?;
-  //   let (input, exp) = alt((boolean, conditional_expression))(input)?;
-  //   let (input, _) = tag("{")(input)?;
-  //   let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
-  //   let (input, commands) = many1(statement)(input)?;
-  //   let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
-  //   let (input, _) = tag("}")(input)?;
-
-
-  // }
+  }
   
   pub fn statement(input: &str) -> IResult<&str, Node> {
     let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
