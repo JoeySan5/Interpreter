@@ -9,12 +9,14 @@ Notation:
 program                 = {function_definition} ;
 function_definition     = "fn" , identifier , "(" , [arguments] , ")" , "{" , [{statement}] , "}" ;
 arguments               = expression , { "," , expression } ;
-statement               = variable_define , ";" | function_return , ";" ;
+statement               = variable_define , ";" | function_return , ";"  ;
 variable_define         = "let" , identifier , "=" , expression ;
 function_return         = "return" , (function_call | expression | identifier) ;
 function_call           = identifier , "(" , [arguments] , ")" ;
-expression              = boolean | conditional_expression | math_expression | function_call | number | string | identifier ;
-conditional_expression =  value , { ("<" | ">" | ">=" | "<=" | "=="), value} ; 
+expression              = boolean | if_expression | conditional_expression | math_expression | function_call | number | string | identifier ;
+if_expression           = "if" , (conditional_expression | boolean) , "{" , {statement} , "}" , [{ else_if_expression}] , "else" , "{" {statement} "}" ;
+else_if_expression      = "else", "if", (conditional_expression | boolean), "{", {statement}, "}" ;
+conditional_expression  = value , { ("<" | ">" | ">=" | "<=" | "=="), value} ; 
 math_expression         = ["("] value , { ("+" | "-" | "*" | "/" ) , value [")"] } [")"] ;
 value                   = number | identifier | boolean;
 operand                 = number | identifier ;
@@ -27,8 +29,7 @@ alnum                   = ?alphanumeric character?;
 digit                   = 0..9;
 whitespace              = space | tab | newline | carriage_return; 
 
-Note: The grammar as written doesn't handle whitespace, although the examples include it. You should handle it accordingly.
-//parse out whitespace
+Note: The grammar as written doesn't handle whitespace, therefore whitespace is parsed out beforehand 
 
 
 
