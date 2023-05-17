@@ -100,12 +100,6 @@ impl Runtime {
         //evals to a bool
         let if_conditional = self.run(&children[0]);
 
-        println!("value of if_conditional: {:?}", if_conditional);
-        println!("value of children 1: {:#?}", children[1]);
-        println!("value of children2: {:#?}", children[2]);
-
-
-
         let mut result = Ok(Value::Bool(false));
          result = match if_conditional {
 
@@ -118,14 +112,11 @@ impl Runtime {
             while index < children.len() && result == target_value {
               // Your loop code here
               result = self.run(&children[index]);
-              println!("showing the index inside the for loop {}, chikdrenlen: {}, children: {:#?} and the result: {:?}",index,children.len(),children,result);
               index += 1;
             };
             
 
             if result == target_value {
-              println!("showing the index outside the for loop{} and the result: {:?}",index,result);
-
               self.run(&children[index])
             }
             else{
@@ -181,11 +172,9 @@ impl Runtime {
         
         let mut result = Ok(Value::Bool(false));
         for child in extract_statements.iter(){
-          println!("child: {:#?}",child);
           
           result = self.run(child);
         };
-        println!("result: {:?}",result);
 
         return result
 
@@ -434,7 +423,7 @@ impl Runtime {
           Ok(Value) =>{
             Value
           },
-          _=> {println!("enter hwere?"); return Err("Undefined function");
+          _=> { return Err("Undefined function");
           }
         };
 
