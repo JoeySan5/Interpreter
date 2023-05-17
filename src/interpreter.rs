@@ -48,7 +48,21 @@ impl Runtime {
                 _ => ()
               }
           }
-      }
+      },
+      Node::IfStatements{children}=>{
+        for child in children {
+          match child{
+            Node::Statement{children} => {
+              match &children[0] {
+                Node::VariableDefine{children} => v.push(Node::VariableDefine{children: children.to_vec()}),
+                Node::FunctionReturn{children} => v.push(Node::FunctionReturn{children: children.to_vec()}),
+                _=>()
+              }
+            },
+            _=>()
+          }
+        }
+      },
       _ => ()
     };
 
@@ -81,6 +95,63 @@ impl Runtime {
         }
         Ok(Value::Bool(true))
       },
+
+
+
+
+      Node::IfExpression{children} => {
+        //evals to a bool
+        let if_conditional = self.run(&children[0]);
+
+        let mut result = match if_conditional {
+          //this returns the value of the first ifstatements node
+          Ok(Value::Bool(true)) => self.run(&children[1]),
+          //enters a elseif node or statements node
+          //Ok(Value::Bool(false)) => self.run(children[2]),
+          _ => Err("no match for if expression")
+
+        };
+
+        return result
+
+
+      },
+
+
+      //traverse thru children and return the final result
+      Node::IfStatements{children} => {
+
+        //create new scope that contains the variables of the previous stack
+        let clone_map = self.stack.last().expect("no stack has been initialized").clone();
+        self.stack.push(clone_map);
+        
+
+        let extract_statements = Self::extract_val(&Node::IfStatements{children:children.to_vec()});
+        println!("this is extract statement{:#?}", extract_statements);
+        //child is a statement
+        match extract_statements.last().expect("no statements in if expression") {
+          Node::FunctionReturn{children} => (),
+          _ => {println!("Error: Final statement for for loop is not a return"); std::process::exit(1); }
+
+        };
+        
+        println!("last child  in if staement: {:#?}",extract_statements.last().expect("No last child"));
+        let mut result = Ok(Value::Bool(false));
+        for child in extract_statements.iter(){
+          println!("child: {:#?}",child);
+          
+          result = self.run(child);
+        };
+        println!("result: {:?}",result);
+
+        return result
+
+      },
+
+
+
+
+
       // Evaluates a mathematical expression based on the elements in the children argument. 
       //If the expression is valid, the code evaluates it and returns a new Value object with the resulting value.
       // If the expression is not valid, the code returns an error message.
@@ -320,7 +391,7 @@ impl Runtime {
           Ok(Value) =>{
             Value
           },
-          _=> { return Err("Undefined function");
+          _=> {println!("enter hwere?"); return Err("Undefined function");
           }
         };
 

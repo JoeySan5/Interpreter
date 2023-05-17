@@ -24,8 +24,12 @@ use nom::{
     Expression { children: Vec<Node> },
     MathExpression {name: String, children: Vec<Node> },
     ConditionalExpression {name: String, children: Vec<Node>},
+
     IfExpression {children: Vec<Node>},
+    IfStatements {children: Vec<Node>},
     ElseIfExpression{children: Vec<Node>},
+    ElseExpression{children: Vec<Node>},
+
     MathAdd {children: Vec<Node> },
     FunctionCall { name: String, children: Vec<Node> },
     VariableDefine { children: Vec<Node> },
@@ -201,6 +205,13 @@ pub fn value(input: &str) -> IResult<&str, Node> {
     Ok((input, Node::Expression{ children: vec![result]}))   
   }
 
+
+
+
+
+
+
+
   //if_expression  = "if" , (conditional_expression | boolean) , "{" , {statement} , "}" , [{ else_if_expression}] , "else" , "{" {statement} "}" ;
   pub fn if_expression(input: &str) -> IResult<&str, Node> {
     let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
@@ -210,32 +221,35 @@ pub fn value(input: &str) -> IResult<&str, Node> {
     let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
     let (input, _) = tag("{")(input)?;
     let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
-    //returns a vec of statements (if block)
-    let (input, mut if_commands) = many1(statement)(input)?;
+    //returns a node of IfStatements
+    let (input, mut if_commands) = if_statement(input)?;
     let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
     let (input, _) = tag("}")(input)?;
     let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
     //returns a vec of elseif nodes if any
     let (input, mut else_exp) = many0(else_if_expression)(input)?;
     let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
-    let (input, _) = tag("else")(input)?;
-    let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
-    let (input, _) = tag("{")(input)?;
-    let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
-    //returns a vec of statements (else block)
-    let (input, mut else_commands) = many1(statement)(input)?;
-    let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
-    let (input, _) = tag("}")(input)?;
-    let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
+
+    //returns a node of ElseExp
+    let (input, mut else_commands) = else_expression(input)?;
 
     let mut new_vec = vec![if_exp];
-    new_vec.append(&mut if_commands);
+    new_vec.push(if_commands);
     new_vec.append(&mut else_exp);
-    new_vec.append(&mut else_commands);
+    new_vec.push(else_commands);
 
     Ok((input, Node::IfExpression{children: new_vec}))
-
   }
+
+  pub fn if_statement(input: &str) -> IResult<&str, Node> {
+    let (input, mut statements) = many1(statement)(input)?;
+
+    Ok((input, Node::IfStatements{children: statements}))
+  }
+
+  
+
+
 
   //else_if_expression = "else", "if", (conditional_expression | boolean), "{", {statement}, "}" ;
   pub fn else_if_expression(input: &str) -> IResult<&str, Node> {
@@ -247,19 +261,41 @@ pub fn value(input: &str) -> IResult<&str, Node> {
     let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
     let (input, _) = tag("{")(input)?;
     let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
-    let (input, mut commands) = many1(statement)(input)?;
+    let (input, mut commands) = (if_statement)(input)?;
     let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
     let (input, _) = tag("}")(input)?;
     let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
     
     let mut new_vec = vec![exp];
-    new_vec.append(&mut commands);
+    new_vec.push(commands);
 
     Ok((input, Node::ElseIfExpression{children: new_vec}))
 
 
   }
+
+  pub fn else_expression(input: &str) -> IResult<&str, Node> {
+    let (input, _) = tag("else")(input)?;
+    let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
+    let (input, _) = tag("{")(input)?;
+    let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
+    //returns a vec of statements (else block)
+    let (input,  else_commands) = (if_statement)(input)?;
+    let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
+    let (input, _) = tag("}")(input)?;
+    let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
+
+    Ok((input, Node::ElseExpression{children: vec![else_commands]}))
   
+    
+
+  }
+
+
+
+
+
+
   pub fn statement(input: &str) -> IResult<&str, Node> {
     let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
     let (input, result) = alt((variable_define, function_return))(input)?;
