@@ -181,6 +181,8 @@ https://drive.google.com/file/d/1stCF12wmpM0I8CTipPAFy7As8nDXTgL4/view?usp=share
 Please submit your completed exam, which should include:
 
 1. A detailed description of the feature you chose to implement (conditional operators or if-expressions).
+I chose to implement both the conditional operators and if-expressions. The conditional operators were handled very similarly to a math-expression. However, I made the conditional operators as level 1, so they had the last precedence. This would compare to or more values and evaluate them to a bool.
+The if-expressions were more involved because the if expression contains many parts such as the conditional expression, the statements, the else if branches, and the else branch. I created nodes for the respective branches of the if expression, to evaluate them in the interpreter more efficiently. I created the interpreter algorithm to evaluate the nodes in order until a true condition is reached(true for one of the arms), and then it returns the result. If none of the else if branches are true, then the else branch is reached and returns its own statements values.
 2. The updated EBNF grammar for your chosen feature.
 3. The updated parser and interpreter code, including any necessary modifications to support your chosen feature.
 4. Test cases demonstrating the correct parsing and evaluation of your chosen feature.
