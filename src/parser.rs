@@ -201,7 +201,7 @@ pub fn value(input: &str) -> IResult<&str, Node> {
 
   //expression = boolean | if_expression | math_expression | function_call | number | string | identifier ;
   pub fn expression(input: &str) -> IResult<&str, Node> {
-    let (input, result) = alt((boolean, if_expression, conditional_expression, math_expression, function_call, number, string, identifier))(input)?;
+    let (input, result) = alt((boolean,if_expression, conditional_expression, math_expression, function_call, number, string, identifier))(input)?;
     Ok((input, Node::Expression{ children: vec![result]}))   
   }
 
@@ -217,32 +217,44 @@ pub fn value(input: &str) -> IResult<&str, Node> {
     let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
     let (input, _) = tag("if")(input)?;
     let (input, _) = many0(tag(" "))(input)?;
-    let (input, if_exp) = alt((boolean, conditional_expression))(input)?;
+    println!("reach here1?");
+
+    let (input, if_exp) = alt((conditional_expression,boolean))(input)?;
     let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
     let (input, _) = tag("{")(input)?;
     let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
     //returns a node of IfStatements
-    let (input, mut if_commands) = if_statement(input)?;
+    let (input, if_commands) = if_statement(input)?;
     let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
     let (input, _) = tag("}")(input)?;
+    println!("reach here2?");
     let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
     //returns a vec of elseif nodes if any
-    let (input, mut else_exp) = many0(else_if_expression)(input)?;
+   // let (input, mut else_exp) = many0(else_if_expression)(input)?;
     let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
+    println!("reach here3?");
+
 
     //returns a node of ElseExp
-    let (input, mut else_commands) = else_expression(input)?;
+    let (input, else_commands) = else_expression(input)?;
+    println!("reach here4?");
+
 
     let mut new_vec = vec![if_exp];
+    println!("reach here5?");
+
     new_vec.push(if_commands);
-    new_vec.append(&mut else_exp);
+    //new_vec.append(&mut else_exp);
     new_vec.push(else_commands);
+    println!("reach here6?");
+
 
     Ok((input, Node::IfExpression{children: new_vec}))
   }
 
+
   pub fn if_statement(input: &str) -> IResult<&str, Node> {
-    let (input, mut statements) = many1(statement)(input)?;
+    let (input, statements) = many1(statement)(input)?;
 
     Ok((input, Node::IfStatements{children: statements}))
   }
@@ -275,12 +287,22 @@ pub fn value(input: &str) -> IResult<&str, Node> {
   }
 
   pub fn else_expression(input: &str) -> IResult<&str, Node> {
+    println!("reach here else exp?");
+
     let (input, _) = tag("else")(input)?;
     let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
+    println!("reach hereelse exp 1.5?");
+
     let (input, _) = tag("{")(input)?;
+    println!("reach here else exp 1.8?");
+
     let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
     //returns a vec of statements (else block)
-    let (input,  else_commands) = (if_statement)(input)?;
+    println!("reach here else exp 2?");
+
+    let (input,  else_commands) = if_statement(input)?;
+    println!("reach here else exp 3?");
+
     let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
     let (input, _) = tag("}")(input)?;
     let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
@@ -348,6 +370,7 @@ pub fn value(input: &str) -> IResult<&str, Node> {
     let (input, _) = many0(tag(" "))(input)?;
     let (input, _) = tag("{")(input)?;
     let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
+    
     let (input, mut statements) = many1(statement)(input)?;
     let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
     let (input, _) = tag("}")(input)?;
@@ -360,7 +383,7 @@ pub fn value(input: &str) -> IResult<&str, Node> {
   
   // program = function_definition+ ;
   pub fn program(input: &str) -> IResult<&str, Node> {
-    let (input, result) = many1(alt((function_definition,statement,expression,number,boolean,string)))(input)?;
+    let (input, result) = many1(function_definition)(input)?;
     Ok((input, Node::Program{ children: result}))
   }
   

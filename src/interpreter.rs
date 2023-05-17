@@ -95,24 +95,33 @@ impl Runtime {
         }
         Ok(Value::Bool(true))
       },
-
-
-
-
+    
       Node::IfExpression{children} => {
         //evals to a bool
         let if_conditional = self.run(&children[0]);
+
+        println!("value of if_conditional: {:?}", if_conditional);
+        println!("value of children 1: {:#?}", children[1]);
+        println!("value of children2: {:#?}", children[2]);
+
+
 
         let mut result = match if_conditional {
           //this returns the value of the first ifstatements node
           Ok(Value::Bool(true)) => self.run(&children[1]),
           //enters a elseif node or statements node
-          //Ok(Value::Bool(false)) => self.run(children[2]),
+          Ok(Value::Bool(false)) => self.run(&children[2]),
           _ => Err("no match for if expression")
 
         };
 
         return result
+
+
+      },
+      //just has a child of ifstatement
+      Node::ElseExpression{children} =>{
+        self.run(&children[0])
 
 
       },
@@ -127,7 +136,6 @@ impl Runtime {
         
 
         let extract_statements = Self::extract_val(&Node::IfStatements{children:children.to_vec()});
-        println!("this is extract statement{:#?}", extract_statements);
         //child is a statement
         match extract_statements.last().expect("no statements in if expression") {
           Node::FunctionReturn{children} => (),
@@ -135,7 +143,6 @@ impl Runtime {
 
         };
         
-        println!("last child  in if staement: {:#?}",extract_statements.last().expect("No last child"));
         let mut result = Ok(Value::Bool(false));
         for child in extract_statements.iter(){
           println!("child: {:#?}",child);
