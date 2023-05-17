@@ -174,6 +174,7 @@ You can use Zoom to do this, [here is a link](https://support.zoom.us/hc/en-us/a
 **⚠️IMPORTANT: Make sure you give blanket permission to the link holder to view the file**
 
 🎥 Paste Recording Link(s) Here:
+https://drive.google.com/file/d/1stCF12wmpM0I8CTipPAFy7As8nDXTgL4/view?usp=share_link 
 
 ## Submission
 
