@@ -96,11 +96,13 @@ impl Runtime {
         Ok(Value::Bool(true))
       },
     
+
       Node::IfExpression{children} => {
         //evals to a bool
         let if_conditional = self.run(&children[0]);
 
         let mut result = Ok(Value::Bool(false));
+
          result = match if_conditional {
 
           //this returns the value of the first ifstatements node
@@ -132,6 +134,7 @@ impl Runtime {
          result
 
       },
+      
       Node::ElseIfExpression{children} =>{
         let conditional = self.run(&children[0]);
 
@@ -240,7 +243,7 @@ impl Runtime {
           "!=" => Ok(Value::Bool(value1 != value2)),
             _ => Err("Undefined Operator for boolean")
         },
-          _=> {Err("This math expression is not possible")}
+          _=> {Err("This Conditional expression is not possible")}
         };
 
         result
