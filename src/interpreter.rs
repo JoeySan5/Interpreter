@@ -118,10 +118,14 @@ impl Runtime {
             while index < children.len() && result == target_value {
               // Your loop code here
               result = self.run(&children[index]);
-
+              println!("showing the index inside the for loop {}, chikdrenlen: {}, children: {:#?} and the result: {:?}",index,children.len(),children,result);
               index += 1;
             };
+            
+
             if result == target_value {
+              println!("showing the index outside the for loop{} and the result: {:?}",index,result);
+
               self.run(&children[index])
             }
             else{
@@ -137,6 +141,18 @@ impl Runtime {
          result
 
       },
+      Node::ElseIfExpression{children} =>{
+        let conditional = self.run(&children[0]);
+
+        if conditional == Ok(Value::Bool(false)){
+          return conditional
+        }
+
+        self.run(&children[1])
+
+
+      },
+      
 
 
       //just has a child of ifstatement

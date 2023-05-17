@@ -217,7 +217,6 @@ pub fn value(input: &str) -> IResult<&str, Node> {
     let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
     let (input, _) = tag("if")(input)?;
     let (input, _) = many0(tag(" "))(input)?;
-    println!("reach here1?");
 
     let (input, if_exp) = alt((conditional_expression,boolean))(input)?;
     let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
@@ -227,26 +226,21 @@ pub fn value(input: &str) -> IResult<&str, Node> {
     let (input, if_commands) = if_statement(input)?;
     let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
     let (input, _) = tag("}")(input)?;
-    println!("reach here2?");
     let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
     //returns a vec of elseif nodes if any
-   // let (input, mut else_exp) = many0(else_if_expression)(input)?;
+    let (input, mut else_exp) = many0(else_if_expression)(input)?;
     let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
-    println!("reach here3?");
 
 
     //returns a node of ElseExp
     let (input, else_commands) = else_expression(input)?;
-    println!("reach here4?");
 
 
     let mut new_vec = vec![if_exp];
-    println!("reach here5?");
 
     new_vec.push(if_commands);
-    //new_vec.append(&mut else_exp);
+    new_vec.append(&mut else_exp);
     new_vec.push(else_commands);
-    println!("reach here6?");
 
 
     Ok((input, Node::IfExpression{children: new_vec}))
@@ -269,7 +263,7 @@ pub fn value(input: &str) -> IResult<&str, Node> {
     let (input, _) = many0(tag(" "))(input)?;
     let (input, _) = tag("if")(input)?;
     let (input, _) = many0(tag(" "))(input)?;
-    let (input, exp) = alt((boolean, conditional_expression))(input)?;
+    let (input, exp) = alt((conditional_expression,boolean))(input)?;
     let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
     let (input, _) = tag("{")(input)?;
     let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
@@ -287,21 +281,16 @@ pub fn value(input: &str) -> IResult<&str, Node> {
   }
 
   pub fn else_expression(input: &str) -> IResult<&str, Node> {
-    println!("reach here else exp?");
 
     let (input, _) = tag("else")(input)?;
     let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
-    println!("reach hereelse exp 1.5?");
 
     let (input, _) = tag("{")(input)?;
-    println!("reach here else exp 1.8?");
 
     let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
     //returns a vec of statements (else block)
-    println!("reach here else exp 2?");
 
     let (input,  else_commands) = if_statement(input)?;
-    println!("reach here else exp 3?");
 
     let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;
     let (input, _) = tag("}")(input)?;

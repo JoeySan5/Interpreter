@@ -5,7 +5,15 @@ use asalang::{program, Value, start_interpreter, Node};
 
 fn main() -> Result<(), nom::Err<(&'static str, nom::error::ErrorKind)>> {
   
-  let result = program(r#"fn main(){let x = if false{let y = 3; return y;} else if true{re} else {return 6;} ; return x;}"#);
+  let result = program(r#"fn main(){
+    let x = if false{
+      let y = 3; return y;
+    } else if false {return 4;} else if false{
+      return 7;
+    } else {
+      return 6;
+    }; 
+    return x;}"#);
   match result {
     Ok((unparsed,tree)) => {
       println!("Unparsed Text: {:?}", unparsed);
