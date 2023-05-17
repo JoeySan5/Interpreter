@@ -106,19 +106,39 @@ impl Runtime {
 
 
 
-        let mut result = match if_conditional {
+        let mut result = Ok(Value::Bool(false));
+         result = match if_conditional {
+
           //this returns the value of the first ifstatements node
           Ok(Value::Bool(true)) => self.run(&children[1]),
-          //enters a elseif node or statements node
-          Ok(Value::Bool(false)) => self.run(&children[2]),
-          _ => Err("no match for if expression")
+          //enters a elseif node or else node
+          Ok(Value::Bool(false)) => {
+            let mut index = 2;
+            let target_value = Ok(Value::Bool(false));
+            while index < children.len() && result == target_value {
+              // Your loop code here
+              result = self.run(&children[index]);
 
+              index += 1;
+            };
+            if result == target_value {
+              self.run(&children[index])
+            }
+            else{
+              result
+            }
+
+          },
+          _ => Err("no match for if expression")
         };
 
-        return result
+        
 
+         result
 
       },
+
+
       //just has a child of ifstatement
       Node::ElseExpression{children} =>{
         self.run(&children[0])
