@@ -9,6 +9,7 @@ use nom::{
     bytes::complete::{tag},
     character::complete::{alphanumeric1, digit1},
   };
+
   
   // Here are the different node types. You will use these to make your parser and your grammar.
   // You may add other nodes as you see fit, but these are expected by the runtime.
@@ -85,9 +86,11 @@ use nom::{
     let (input, _) = many0(tag(" "))(input)?;
     Ok((input, args))
   }
+  
   pub fn l4(input: &str) -> IResult<&str, Node> {
     alt((function_call, boolean, number, identifier, parenthetical_expression))(input)
   }
+
   pub fn l3_infix(input: &str) -> IResult<&str, Node> {
     let (input, _) = many0(tag(" "))(input)?;
     let (input, op) = tag("^")(input)?;
@@ -95,6 +98,7 @@ use nom::{
     let (input, args) = l4(input)?;
     Ok((input, Node::MathExpression{name: op.to_string(), children: vec![args]}))
   }
+
   pub fn l3(input: &str) -> IResult<&str, Node> {
     let (input, mut head) = l4(input)?;
     let (input, tail) = many0(l3_infix)(input)?;
@@ -110,6 +114,7 @@ use nom::{
     }
     Ok((input, head))
   }
+
   pub fn l2_infix(input: &str) -> IResult<&str, Node> {
     let (input, _) = many0(tag(" "))(input)?;
     let (input, op) = alt((tag("*"),tag("/")))(input)?;
@@ -117,6 +122,7 @@ use nom::{
     let (input, args) = l2(input)?;
     Ok((input, Node::MathExpression{name: op.to_string(), children: vec![args]}))
   }
+
   pub fn l2(input: &str) -> IResult<&str, Node> {
     let (input, mut head) = l3(input)?;
     let (input, tail) = many0(l2_infix)(input)?;
@@ -132,6 +138,7 @@ use nom::{
     }
     Ok((input, head))
   }
+
   pub fn l1_infix(input: &str) -> IResult<&str, Node> {
     let (input, _) = many0(tag(" "))(input)?;
     let (input, op) = alt((tag("+"),tag("-")))(input)?;
@@ -139,6 +146,7 @@ use nom::{
     let (input, args) = l2(input)?;
     Ok((input, Node::MathExpression{name: op.to_string(), children: vec![args]}))
   }
+
   pub fn l1(input: &str) -> IResult<&str, Node> {
     let (input, _) = many0(tag(" "))(input)?;
     let (input, mut head) = l2(input)?;
@@ -189,15 +197,13 @@ use nom::{
     Ok((input, Node::ConditionalExpression{name: op.to_string(), children: vec![args]}))
   }
   
-
   // value = boolean | number | identifier ;
-pub fn value(input: &str) -> IResult<&str, Node> {
+  pub fn value(input: &str) -> IResult<&str, Node> {
   let (input, _ ) = many0(tag(" "))(input)?;
   let (input_left, output) = alt((boolean, number, identifier))(input)?;
   let (input, _ ) = many0(tag(" "))(input)?;
 
   IResult::Ok((input_left,output))
-
 }
 
   //expression = boolean | if_expression | math_expression | function_call | number | string | identifier ;
@@ -205,13 +211,6 @@ pub fn value(input: &str) -> IResult<&str, Node> {
     let (input, result) = alt((boolean,if_expression, conditional_expression, math_expression, function_call, number, string, identifier))(input)?;
     Ok((input, Node::Expression{ children: vec![result]}))   
   }
-
-
-
-
-
-
-
 
   //if_expression  = "if" , (conditional_expression | boolean) , "{" , {statement} , "}" , [{ else_if_expression}] , "else" , "{" {statement} "}" ;
   pub fn if_expression(input: &str) -> IResult<&str, Node> {
@@ -254,10 +253,6 @@ pub fn value(input: &str) -> IResult<&str, Node> {
     Ok((input, Node::IfStatements{children: statements}))
   }
 
-  
-
-
-
   //else_if_expression = "else", "if", (conditional_expression | boolean), "{", {statement}, "}" ;
   pub fn else_if_expression(input: &str) -> IResult<&str, Node> {
     let (input, _) = tag("else")(input)?;
@@ -277,8 +272,6 @@ pub fn value(input: &str) -> IResult<&str, Node> {
     new_vec.push(commands);
 
     Ok((input, Node::ElseIfExpression{children: new_vec}))
-
-
   }
 
   pub fn else_expression(input: &str) -> IResult<&str, Node> {
@@ -302,11 +295,6 @@ pub fn value(input: &str) -> IResult<&str, Node> {
     
 
   }
-
-
-
-
-
 
   pub fn statement(input: &str) -> IResult<&str, Node> {
     let (input, _) = many0(alt((tag(" "),tag("\n"))))(input)?;

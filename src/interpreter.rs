@@ -1,6 +1,8 @@
 use crate::parser::Node;
 use std::collections::HashMap;
 
+const RETURN_VAR: i32 = 0;
+
 #[derive(Debug, PartialEq, Clone)]
 pub enum Value {
   String(String),
@@ -364,6 +366,7 @@ impl Runtime {
       //which recursively evaluates the AST of the program being executed and returns the resulting value or error message.
       Node::FunctionReturn{children} => {
         let result = self.run(&children[0]);
+       
         self.stack.pop();
         result
       },

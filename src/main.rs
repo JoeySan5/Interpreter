@@ -6,12 +6,11 @@ use asalang::{program, Value, start_interpreter, Node};
 fn main() -> Result<(), nom::Err<(&'static str, nom::error::ErrorKind)>> {
   
   let result = program(r#"fn main(){
-    let x = if false{
-      let y = 3; return y;
-    } else if false {return 4;} else if false{
-      return 7;
+    let y = 4;
+    let x = if true{
+      let f =5;
     } else {
-      return 6;
+      return y;
     }; 
     return x;}"#);
   match result {

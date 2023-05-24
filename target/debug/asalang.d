@@ -1,1 +1,1 @@
-/mnt/c/Users/josep/CS262/final/target/debug/asalang: /mnt/c/Users/josep/CS262/final/src/interpreter.rs /mnt/c/Users/josep/CS262/final/src/lib.rs /mnt/c/Users/josep/CS262/final/src/main.rs /mnt/c/Users/josep/CS262/final/src/parser.rs
+/mnt/c/Users/josep/interpreter/target/debug/asalang: /mnt/c/Users/josep/interpreter/src/interpreter.rs /mnt/c/Users/josep/interpreter/src/lib.rs /mnt/c/Users/josep/interpreter/src/main.rs /mnt/c/Users/josep/interpreter/src/parser.rs
